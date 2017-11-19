@@ -1,63 +1,49 @@
-import requests  
-import datetime
-from config import token
+import config
+import os
+import telebot
 
-class BotHandler:
-
-    def __init__(self, token):
-        self.token = token
-        self.api_url = "https://api.telegram.org/bot{}/".format(token)
-
-    def get_updates(self, offset=None, timeout=30):
-        method = 'getUpdates'
-        params = {'timeout': timeout, 'offset': offset}
-        resp = requests.get(self.api_url + method, params)
-        result_json = resp.json()['result']
-        return result_json
-
-    def send_message(self, chat_id, text):
-        params = {'chat_id': chat_id, 'text': text}
-        method = 'sendMessage'
-        resp = requests.post(self.api_url + method, params)
-        return resp
-
-    def get_last_update(self):
-        get_result = self.get_updates()
-
-        if len(get_result) > 0:
-            last_update = get_result[-1]
-        else:
-            last_update = get_result[len(get_result)]
-
-        return last_update
-
-greet_bot = BotHandler(token)
-greetings = ('здравствуй', 'привет', 'ку', 'здорово')
-now = datetime.datetime.now()
+from flask import Flask, request
 
 
-def main():
-    new_offset = None
-    today = now.day
-    hour = now.hour
 
-    while True:
-        greet_bot.get_updates(new_offset)
 
-        last_update = greet_bot.get_last_update()
+bot = telebot.TeleBot(config.token)
+app = Flask(__name__)
 
-        last_update_id = last_update['update_id']
-        last_chat_text = last_update['message']['text']
-        last_chat_id = last_update['message']['chat']['id']
-        last_chat_name = last_update['message']['chat']['first_name']
 
-        greet_bot.send_message(last_chat_id, 'Добрый вечер, {}'.format(last_chat_name))
-        today += 1
 
-        new_offset = last_update_id + 1
+@app.route(f"/{config.token}", methods=['POST'])
+def getMessage():
+    bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
+    return "!", 200
 
-if __name__ == '__main__':
-    try:
-        main()
-    except KeyboardInterrupt:
-        exit()
+
+@app.route("/")
+def webhook():
+    bot.remove_webhook()
+    bot.set_webhook(url=f"https://shielded-river-72517.herokuapp.com/{config.token}")
+    return "!", 200
+
+
+@bot.message_handler(commands=['help_me'])
+def help_message(message):
+    """Send message to user with explaining game rules."""
+
+    text = """
+    Hello, I'm a super dictionary bot!
+    I'll glad to help you with learning new words!
+    For register please call /start command!
+    Game: first of all you need to add some words to you dictionary
+    call /add <your word> command to add new one
+    When you'll be ready, just call /game command.
+    If you feel that it's enough for today, call /end command just from game
+    To see list of all words in dictionary - call /show_all command!
+    Hope you'll like me!
+    Let's start!
+    """
+    bot.send_message(message.chat.id, text)
+
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
