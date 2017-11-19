@@ -1,6 +1,8 @@
 import config
 import os
 import telebot
+import bond_quotes
+from random import choice
 
 from flask import Flask, request
 
@@ -25,22 +27,11 @@ def webhook():
     return "!", 200
 
 
-@bot.message_handler(commands=['help_me'])
+@bot.message_handler(content_types=["text"])
 def help_message(message):
     """Send message to user with explaining game rules."""
 
-    text = """
-    Hello, I'm a super dictionary bot!
-    I'll glad to help you with learning new words!
-    For register please call /start command!
-    Game: first of all you need to add some words to you dictionary
-    call /add <your word> command to add new one
-    When you'll be ready, just call /game command.
-    If you feel that it's enough for today, call /end command just from game
-    To see list of all words in dictionary - call /show_all command!
-    Hope you'll like me!
-    Let's start!
-    """
+    text = choice(bond_quotes.quotes)
     bot.send_message(message.chat.id, text)
 
 
