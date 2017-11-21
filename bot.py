@@ -21,16 +21,17 @@ def webhook():
     bot.set_webhook(url=f"https://shielded-river-72517.herokuapp.com/{config.token}")
     return "!", 200
 
+@bot.message_handler(commands=['about'])
+def about_bot(message):
+    text = """Присвячується Віктору Григоровичу, одному з найпозитивніших викладачів у моєму житті."""
+    bot.send_message(message.chat.id, text)
 
 @bot.message_handler(content_types=["text"])
 def help_message(message):
     text = choice(bond_quotes.quotes)
     bot.send_message(message.chat.id, text)
 
-@bot.message_handler(commands=['about'])
-def about_bot(message):
-    text = """Присвячується Віктору Григоровичу, одному з найпозитивніших викладачів у моєму житті."""
-    bot.send_message(message.chat.id, text)
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
