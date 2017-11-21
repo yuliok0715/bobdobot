@@ -27,7 +27,7 @@ def help_message(message):
     text = choice(bond_quotes.quotes)
     bot.send_message(message.chat.id, text)
 
-@bot.message_handler(commands=['about', 'start'])
+@bot.message_handler(commands=['about'])
 def about_bot(message):
     text = """Присвячується Віктору Григоровичу, одному з найпозитивніших викладачів у моєму житті."""
     bot.send_message(message.chat.id, text)
