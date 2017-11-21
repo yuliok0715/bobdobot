@@ -6,13 +6,8 @@ from random import choice
 
 from flask import Flask, request
 
-
-
-
 bot = telebot.TeleBot(config.token)
 app = Flask(__name__)
-
-
 
 @app.route(f"/{config.token}", methods=['POST'])
 def getMessage():
@@ -29,8 +24,6 @@ def webhook():
 
 @bot.message_handler(content_types=["text"])
 def help_message(message):
-    """Send message to user with explaining game rules."""
-
     text = choice(bond_quotes.quotes)
     bot.send_message(message.chat.id, text)
 
