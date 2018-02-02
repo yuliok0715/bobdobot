@@ -5,7 +5,7 @@ Base = declarative_base()
 
 
 class Quote(Base):
-    __tablename__ = 'user'
+    __tablename__ = 'quote'
 
     id = Column(Integer, primary_key=True)
     quote = Column(String)
