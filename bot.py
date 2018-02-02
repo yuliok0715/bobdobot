@@ -30,7 +30,7 @@ def about_bot(message):
 
 @bot.message_handler(content_types=["text"])
 def help_message(message):
-    text = choice(x for x in open('quotes.txt'))
+    text = choice([x for x in open('quotes.txt')])
     bot.send_message(message.chat.id, text)
 
 
