@@ -2,13 +2,26 @@ import config
 import os
 import telebot
 import bond_quotes
+import sqlalchemy as sa
 from random import choice
-
-
+from models import Base, Quote
+from sqlalchemy.orm import sessionmaker
 from flask import Flask, request
+
+
+
+engine = sa.create_engine(config.DATABASE_URL, echo=True)
+Session = sessionmaker(bind=engine)
+
 
 bot = telebot.TeleBot(config.token)
 app = Flask(__name__)
+
+session = Session()
+for line in open('quotes.txt'):
+    session.add(Quote(quote = line))
+session.commit()
+session.close()
 
 @app.route(f"/{config.token}", methods=['POST'])
 def getMessage():
@@ -29,11 +42,13 @@ def about_bot(message):
 
 @bot.message_handler(content_types=["text"])
 def help_message(message):
-    text = choice(bond_quotes.quotes)
+    session = Session()
+    text = choice(session.query(Quote.quote))
     bot.send_message(message.chat.id, text)
-
+    session.close()
 
 
 if __name__ == "__main__":
+    Base.metadata.create_all(engine)
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
