@@ -43,7 +43,7 @@ def about_bot(message):
 @bot.message_handler(content_types=["text"])
 def help_message(message):
     session = Session()
-    text = choice(bond_quotes.quotes)
+    text = choice(session.query(Quote.quote))
     bot.send_message(message.chat.id, text)
     session.close()
 
