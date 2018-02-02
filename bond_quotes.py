@@ -1,1 +1,1 @@
-quotes = [open('quotes.txt').readlines()]
+quotes = [x for x in open('quotes.txt')]
