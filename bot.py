@@ -17,11 +17,7 @@ Session = sessionmaker(bind=engine)
 bot = telebot.TeleBot(config.token)
 app = Flask(__name__)
 
-session = Session()
-for line in open('quotes.txt'):
-    session.add(Quote(quote = line))
-session.commit()
-session.close()
+
 
 @app.route(f"/{config.token}", methods=['POST'])
 def getMessage():
@@ -52,3 +48,8 @@ if __name__ == "__main__":
     Base.metadata.create_all(engine)
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
+    session = Session()
+    for line in open('quotes.txt'):
+        session.add(Quote(quote=line))
+    session.commit()
+    session.close()
